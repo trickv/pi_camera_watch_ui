@@ -16,7 +16,7 @@ if ($_REQUEST['timestamp']) {
     }
     $row = mysql_fetch_row($result);
     if (!$row) {
-        error("Failed sql:(  " . $sql);
+        error("Failed sql:(  " . $sql . mysql_error());
     }
     header("HTTP/1.1 200 OK");
     header("Content-Type: image/webp");
@@ -24,13 +24,14 @@ if ($_REQUEST['timestamp']) {
 } else {
     header("HTTP/1.1 200 OK");
     print("<html><body>");
+    print("<h1>Images</h1>");
 
-    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age, md5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
+    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age, ROUND(LENGTH(image) / 1024 / 1024 * 8, 1) AS cost_c, MD5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed to query :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>timestamp</th><th>age</th><th>md5</th><th>len</th></tr>");
+    print("<table><tr><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr>");
         $index = 0;
