@@ -25,24 +25,37 @@ if ($_REQUEST['timestamp']) {
     header("HTTP/1.1 200 OK");
     print("<html><body>");
 
-    $sql = "SELECT timestamp, md5(image) FROM image LIMIT 10";
+    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age, md5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
     $result = mysql_query($sql);
     if (!$result) {
-        error("Failed to insert :(  " . $sql);
+        error("Failed to query :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>timestamp</th><th>md5</th></tr>");
+    print("<table><tr><th>timestamp</th><th>age</th><th>md5</th><th>len</th></tr>");
     while ($row = mysql_fetch_row($result)) {
-        print("<tr><td><a href='?timestamp=" . $row[0] . "'>" . $row[0] . "</a></td><td>" . $row[1] . "</td></tr>");
+        print("<tr>");
+        $index = 0;
+        foreach ($row as $col) {
+            print("<td>");
+            if ($index == 0) {
+                print("<a href=\"?timestamp=" . $col . "\">");
+            }
+            print($col);
+            if ($index == 0) {
+                print("</a>");
+            }
+            print("</td>");
+            $index++;
+        }
     }
     print("</table>");
 
     print("<h1>hourly beacon</h1>");
-    $sql = "SELECT timestamp, now() FROM log order by timestamp desc LIMIT 10";
+    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age FROM log ORDER BY timestamp DESC LIMIT 10";
     $result = mysql_query($sql);
     if (!$result) {
-        error("Failed to insert :(  " . $sql);
+        error("Failed to sql :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>timestamp</th><th>md5</th></tr>");
+    print("<table><tr><th>timestamp</th><th>age</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>");
     }
