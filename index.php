@@ -8,8 +8,8 @@ function error($message) {
 mysql_connect('localhost', 'remotecam', 'remotecam') or error(mysql_error());
 mysql_select_db('remotecam') or error(mysql_error());
 
-if ($_REQUEST['timestamp']) {
-    $sql = "SELECT HEX(image) FROM image WHERE timestamp = '" . mysql_escape_string($_REQUEST['timestamp']) . "'";
+if ($_REQUEST['id']) {
+    $sql = "SELECT HEX(image) FROM image WHERE id = '" . mysql_escape_string($_REQUEST['id']) . "'";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed sql:(  " . $sql . mysql_error());
@@ -26,19 +26,20 @@ if ($_REQUEST['timestamp']) {
     print("<html><body>");
     print("<h1>Images</h1>");
 
-    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age, ROUND(LENGTH(image) / 1024 / 1024 * 8, 1) AS cost_c, MD5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
+    // magic 823 bytes of overhead it seems per request
+    $sql = "SELECT id, timestamp, ROUND((NOW() - timestamp)/10000,1) AS age, ROUND((LENGTH(image) + 823) / 1024 / 1024 * 60, 2) AS cost_c, MD5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed to query :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
+    print("<table><tr><th>id</th><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr>");
         $index = 0;
         foreach ($row as $col) {
             print("<td>");
             if ($index == 0) {
-                print("<a href=\"?timestamp=" . $col . "\">");
+                print("<a href=\"?id=" . $col . "\">");
             }
             print($col);
             if ($index == 0) {
@@ -51,7 +52,7 @@ if ($_REQUEST['timestamp']) {
     print("</table>");
 
     print("<h1>hourly beacon</h1>");
-    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/3600,1) AS age FROM log ORDER BY timestamp DESC LIMIT 10";
+    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/10000,1) AS age FROM log ORDER BY timestamp DESC LIMIT 10";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed to sql :(  " . $sql . mysql_error());
