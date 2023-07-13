@@ -40,7 +40,7 @@ if ($_REQUEST['id']) {
     if (!$result) {
         error("Failed to query :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>id</th><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
+    print("<table border=1><tr><th>id</th><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr>");
         $index = 0;
@@ -65,7 +65,7 @@ if ($_REQUEST['id']) {
     if (!$result) {
         error("Failed to sql :(  " . $sql . mysql_error());
     }
-    print("<table><tr><th>timestamp</th><th>age</th></tr>");
+    print("<table border=1><tr><th>timestamp</th><th>age</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>");
     }
