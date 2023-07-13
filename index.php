@@ -24,6 +24,14 @@ if ($_REQUEST['id']) {
 } else {
     header("HTTP/1.1 200 OK");
     print("<html><body>");
+
+    $sql = "SELECT NOW()";
+    $result = mysql_query($sql);
+    if (!$result) {
+        error("Failed sql:(  " . $sql . mysql_error());
+    }
+    $row = mysql_fetch_row($result);
+    print("<h3>Current server time: " . $row[0] . "</h3>");
     print("<h1>Images</h1>");
 
     // magic 823 bytes of overhead it seems per request
