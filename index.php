@@ -23,6 +23,7 @@ if ($_REQUEST['id']) {
     print(hex2bin($row[0]));
 } else {
     header("HTTP/1.1 200 OK");
+    Header("Refresh: 60");
     print("<html><body>");
 
     $sql = "SELECT NOW()";
