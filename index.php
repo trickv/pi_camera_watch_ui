@@ -36,12 +36,12 @@ if ($_REQUEST['id']) {
     print("<h1>Images</h1>");
 
     // magic 823 bytes of overhead it seems per request
-    $sql = "SELECT id, timestamp, ROUND((NOW() - timestamp)/10000,1) AS age, ROUND((LENGTH(image) + 823) / 1024 / 1024 * 60, 2) AS cost_c, MD5(image), length(image) FROM image ORDER BY timestamp DESC LIMIT 10";
+    $sql = "SELECT id, timestamp, ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(timestamp))/3600,1) AS age, ROUND((LENGTH(image) + 823) / 1024 / 1024 * 60, 2) AS cost_c, MD5(image), length(image), method, checksum FROM image ORDER BY timestamp DESC LIMIT 15";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed to query :(  " . $sql . mysql_error());
     }
-    print("<table border=1><tr><th>id</th><th>timestamp</th><th>age</th><th>cost (cents)</th><th>md5</th><th>len</th></tr>");
+    print("<table border=1><tr><th>id</th><th>timestamp</th><th>age (h)</th><th>cost (cents)</th><th>md5</th><th>len</th><th>method</th><th>checksum</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr>");
         $index = 0;
@@ -61,12 +61,12 @@ if ($_REQUEST['id']) {
     print("</table>");
 
     print("<h1>hourly beacon</h1>");
-    $sql = "SELECT timestamp, ROUND((NOW() - timestamp)/10000,1) AS age FROM log ORDER BY timestamp DESC LIMIT 10";
+    $sql = "SELECT timestamp, ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(timestamp))/3600,1) AS age FROM log ORDER BY timestamp DESC LIMIT 30";
     $result = mysql_query($sql);
     if (!$result) {
         error("Failed to sql :(  " . $sql . mysql_error());
     }
-    print("<table border=1><tr><th>timestamp</th><th>age</th></tr>");
+    print("<table border=1><tr><th>timestamp</th><th>age (h)</th></tr>");
     while ($row = mysql_fetch_row($result)) {
         print("<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>");
     }
